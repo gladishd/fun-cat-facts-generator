@@ -42,29 +42,30 @@ export default class App extends React.Component {
   async onSubmit(e) {
     try {
       e.preventDefault()
-      let value = e.target.elements.submittedAnswer.value
+      let value = parseInt(e.target.elements.howMany.value)
       const { maintainHistory, generateFunFact } = this;
-      maintainHistory(value)
-      let funFact = encodeURIComponent(this.state.funFact)
+      maintainHistory(`${value} fun facts coming up!`)
+
 
       swal({
-        title: `Welcome to the API test.`,
+        title: `Welcome to Fun Facts.`,
         text: `Do you want to proceed?`,
         icon: 'warning',
         buttons: true,
         dangerMode: true,
       }).then(async (submitAnswer) => {
         if (submitAnswer) {
-          await axios({
-            method: 'get',
-            // url: `http://api.mathjs.org/v4/?expr=${funFact}`,
-            url: `https://catfact.ninja/fact`,
-          }).then(function (response) {
-            swal(`${response.data.fact}`)
-            generateFunFact(response.data.fact)
-          }).catch(function (error) {
-            console.log(error)
-          })
+          for (let i = 0; i < value; i++) {
+            await axios({
+              method: 'get',
+              url: `https://catfact.ninja/fact`,
+            }).then(function (response) {
+              swal(`${response.data.fact}`)
+              generateFunFact(response.data.fact)
+            }).catch(function (error) {
+              console.log(error)
+            })
+          }
         } else {
           swal("Excellent!  Come again another time.")
         }
@@ -83,7 +84,7 @@ export default class App extends React.Component {
             <div>
               <b>Welcome to the Fun Facts page,</b>
               <br />
-              where you can request anything you want to know.
+              where you can order anything you want to know.
               <br />
               Get random cat facts via text message every day if you want,
               <br />
@@ -102,10 +103,10 @@ export default class App extends React.Component {
               <div style={{ display: 'flex' }}
                 id='formFlexBox'
               >
-                <Form.Control as="textarea"
+                <Form.Control type="number"
                   className='appClassName'
-                  name='submittedAnswer'
-                  placeholder='Add your own fun fact!' rows={3} style={{ width: '50vw' }} />
+                  name='howMany'
+                  placeholder='how many?!' rows={3} style={{ width: '200px', fontSize: '1em' }} />
 
                 <Button className='submitButton' variant="primary" type="submit">
                   Request Fun Fact
