@@ -9,30 +9,23 @@ export default class App extends React.Component {
   constructor() {
     super()
     this.state = {
-      a: null,
-      operation: '',
-      b: null,
-      expression: '',
+      funFact: '',
       userInput: '',
       responseData: [],
     }
     this.maintainHistory = this.maintainHistory.bind(this)
     this.onSubmit = this.onSubmit.bind(this)
-    this.generateMathProblem = this.generateMathProblem.bind(this)
+    this.generateFunFact = this.generateFunFact.bind(this)
   }
-  generateMathProblem() {
-    let a = Math.floor(Math.random() * 101)
-    let operation = ['+', '-', '*', '/'][Math.floor(Math.random() * 4)]
-    let b = Math.floor(Math.random() * 101)
-    let expression = `${a} ${operation} ${b}`
+  generateFunFact(fact) {
+    this.maintainHistory(fact)
     this.setState({
-      a, operation, b, expression
+      funFact: fact
     })
-    this.maintainHistory(`${expression} = ?`)
   }
   componentDidMount() {
     try {
-      this.generateMathProblem()
+      this.generateFunFact()
     } catch (err) {
       console.log(err)
     }
@@ -50,13 +43,13 @@ export default class App extends React.Component {
     try {
       e.preventDefault()
       let value = e.target.elements.submittedAnswer.value
-      const { maintainHistory, generateMathProblem } = this;
+      const { maintainHistory, generateFunFact } = this;
       maintainHistory(value)
-      let expression = encodeURIComponent(this.state.expression)
+      let funFact = encodeURIComponent(this.state.funFact)
 
       swal({
-        title: `Your answer is ${value}.`,
-        text: `Do you want to submit the value ${value}?`,
+        title: `Welcome to the API test.`,
+        text: `Do you want to proceed?`,
         icon: 'warning',
         buttons: true,
         dangerMode: true,
@@ -64,20 +57,16 @@ export default class App extends React.Component {
         if (submitAnswer) {
           await axios({
             method: 'get',
-            url: `http://api.mathjs.org/v4/?expr=${expression}`,
+            // url: `http://api.mathjs.org/v4/?expr=${funFact}`,
+            url: `https://catfact.ninja/fact`,
           }).then(function (response) {
-            // eslint-disable-next-line
-            if (value == response.data) {
-              swal(`Thank you for submitting such a correct query and query format.  The response is ${response.data}`)
-              generateMathProblem()
-            } else {
-              swal(`The server has spoken, you didn't submit the correct response!`)
-            }
+            swal(`${response.data.fact}`)
+            generateFunFact(response.data.fact)
           }).catch(function (error) {
             console.log(error)
           })
         } else {
-          swal("Excellent!  Try a more complete and fun answer which matches one of the displayed options.")
+          swal("Excellent!  Come again another time.")
         }
       })
     } catch (err) {
@@ -89,31 +78,23 @@ export default class App extends React.Component {
     return (
       <div className="App" >
         <header className="App-header">
-          <div className='titleText'>Addition Practice</div>
+          <div className='titleText'>Request Your Own...</div>
           <div style={{ textAlign: 'left', display: 'flex', width: '90vw', justifyContent: 'space-between' }}>
             <div>
-              <b>A list of example expressions is,</b>
+              <b>Welcome to the Fun Facts page,</b>
               <br />
-              a = 1.2 * (2 + 4.5),
+              where you can request anything you want to know.
               <br />
-              a / 2,
+              Get random cat facts via text message every day if you want,
               <br />
-              5.08 cm in inch,
-              <br />
-              sin(45 deg) ^ 2,
-              <br />
-              9 / 3 + 2i,
-              <br />
-              b = [-1, 2; 3, 1],
-              <br />
-              det(b)
+              via https://catfact.ninja/.
             </div><div
               style={{ display: 'flex', flexDirection: 'column' }}
-            >Previous Response Values!
+            >Fun Facts!
               {this.state.responseData.map(e => <div>{e}</div>)}</div>
           </div>
-          <p className="App-logo" alt="Mathematical Expression">
-            <code>{this.state.expression} = ?</code>
+          <p className="App-logo" alt="Mathematical funFact">
+            <code>{this.state.funFact}</code>
           </p>
           <Form style={{ position: 'absolute' }} onSubmit={this.onSubmit}>
             <Form.Group role="form" controlId="form.ControlTextArea"
@@ -124,25 +105,24 @@ export default class App extends React.Component {
                 <Form.Control as="textarea"
                   className='appClassName'
                   name='submittedAnswer'
-                  placeholder='Give the API a value!  The soon-to-be value will be much appreciated!' rows={3} style={{ width: '50vw' }} />
+                  placeholder='Add your own fun fact!' rows={3} style={{ width: '50vw' }} />
 
                 <Button className='submitButton' variant="primary" type="submit">
-                  Submit Answer
+                  Request Fun Fact
                 </Button>
               </div>
             </Form.Group>
           </Form>
-
+          -Dean Gladish
           <a
             className="App-link"
-            href="https://api.mathjs.org/"
+            href="https://catfact.ninja/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            This project uses the Math.js API!
+            This project uses the Cat Facts API!
           </a>
         </header>
-
       </div>
     );
   }
